@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -11,9 +10,6 @@ import (
 	"strings"
 	"time"
 )
-
-// download url:
-// https://www.factorio.com/get-download/1.1.94/headless/linux64
 
 /*
 0.307 Info ServerMultiplayerManager.cpp:814: updateTick(4294967295) changing state from(Ready) to(PreparedToHostGame)
@@ -64,7 +60,7 @@ func run(flags []string) {
 	flags = append(flags, "--start-server")
 	flags = append(flags, "template.zip")
 
-	cmd := exec.Command(fmt.Sprintf("./bin/%s/factorio", arch), flags...)
+	cmd := exec.Command("./bin/x64/factorio", flags...)
 	cmd.Dir = serverDir
 
 	// these pipes will read the process stdout and stderr
