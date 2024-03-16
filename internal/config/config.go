@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"flag"
@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 )
 
-var serverDir string
-var factorioUser string
-var factorioToken string
+var ServerDir string
+var FactorioUser string
+var FactorioToken string
 
 func init() {
 	serverDirP := flag.String("server-dir", "server", "Server base dir and process pwd")
@@ -21,8 +21,8 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	serverDir = p
+	ServerDir = p
 
-	factorioUser = *factorioUserP
-	factorioToken = *factorioTokenP
+	FactorioUser = *factorioUserP
+	FactorioToken = *factorioTokenP
 }

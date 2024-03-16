@@ -1,4 +1,4 @@
-package main
+package factorio_com
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ type versionModel struct {
 
 var cachedLatestRelease *semver.Version = nil
 
-func latestRelease() semver.Version {
+func LatestRelease() semver.Version {
 	if cachedLatestRelease != nil {
 		return *cachedLatestRelease
 	}

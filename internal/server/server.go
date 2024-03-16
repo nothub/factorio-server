@@ -1,10 +1,12 @@
-package main
+package server
 
 import (
 	"archive/tar"
 	"bufio"
 	"fmt"
 	"github.com/adrg/xdg"
+	"github.com/nothub/factorio-server/internal/config"
+	factorio_com "github.com/nothub/factorio-server/internal/factorio.com"
 	"github.com/nothub/factorio-server/internal/files"
 	"github.com/ulikunitz/xz"
 	"io"
@@ -38,7 +40,7 @@ var reJoined = regexp.MustCompile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\
 // 2023-11-02 18:07:32 [LEAVE] hub left the game
 var reLeft = regexp.MustCompile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\[LEAVE\\] (\\w+) left the game$")
 
-func run(args []string) (shutdown func()) {
+func Run(args []string) (shutdown func()) {
 	setup()
 
 	for _, arg := range args {
@@ -63,7 +65,7 @@ func run(args []string) (shutdown func()) {
 	}
 
 	cmd := exec.Command("./bin/x64/factorio", args...)
-	cmd.Dir = serverDir
+	cmd.Dir = config.ServerDir
 
 	// these pipes will read the process stdout and stderr
 	r, w, err := os.Pipe()
@@ -143,7 +145,7 @@ func handle(line string, in *io.WriteCloser) {
 
 func createMap() {
 	cmd := exec.Command("./bin/x64/factorio", "--create", "map.zip")
-	cmd.Dir = serverDir
+	cmd.Dir = config.ServerDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	log.Println("Creating fresh map")
@@ -171,10 +173,10 @@ func savesExist() (ok bool) {
 	return ok
 }
 
-var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", latestRelease().String()))
+var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorio_com.LatestRelease().String()))
 
 func setup() {
-	binPath := filepath.Join(serverDir, "bin", "x64", "factorio")
+	binPath := filepath.Join(config.ServerDir, "bin", "x64", "factorio")
 	if _, err := os.Stat(binPath); err == nil {
 		// server dir is already prepared
 		return
@@ -190,7 +192,7 @@ func setup() {
 			log.Fatalln(err)
 		}
 
-		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", latestRelease().String())
+		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", factorio_com.LatestRelease().String())
 		log.Printf("downloading server archive from: %s\n", u)
 
 		req, err := http.NewRequest(http.MethodGet, u, nil)
@@ -226,7 +228,7 @@ func setup() {
 
 	// unpack archive
 
-	log.Printf("extracting %s to: %s\n", filepath.Base(archivePath), serverDir)
+	log.Printf("extracting %s to: %s\n", filepath.Base(archivePath), config.ServerDir)
 
 	f, err := os.Open(archivePath)
 	if err != nil {
@@ -254,7 +256,7 @@ func setup() {
 			continue
 		}
 
-		path, err := filepath.Abs(filepath.Join(serverDir, strings.TrimPrefix(hdr.Name, "factorio/")))
+		path, err := filepath.Abs(filepath.Join(config.ServerDir, strings.TrimPrefix(hdr.Name, "factorio/")))
 		if err != nil {
 			log.Fatalln(err)
 		}

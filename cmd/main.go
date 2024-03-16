@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/nothub/factorio-server/internal/server"
 	"log"
 	"os"
 	"os/signal"
@@ -12,7 +13,7 @@ func main() {
 	log.SetFlags(0)
 	log.Println("The factory must grow!")
 
-	quit := run(flag.Args())
+	quit := server.Run(flag.Args())
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
