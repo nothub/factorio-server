@@ -93,11 +93,6 @@ func Run(args []string) (shutdown func()) {
 		if err = cmd.Run(); err != nil {
 			log.Fatalln(err)
 		}
-
-		// wait for leftover operations and release resources
-		if err = cmd.Wait(); err != nil {
-			log.Fatalln(err)
-		}
 	}()
 
 	// scan server console output periodically
@@ -152,9 +147,6 @@ func createMap() {
 	if err := cmd.Run(); err != nil {
 		log.Fatalln(err)
 	}
-	//if err := cmd.Wait(); err != nil {
-	//	log.Fatalln(err)
-	//}
 }
 
 func savesExist() (ok bool) {
