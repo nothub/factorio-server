@@ -1,4 +1,4 @@
-package factorio_com
+package main
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type VersionModel struct {
+type versionModel struct {
 	Experimental struct {
 		Alpha    string `json:"alpha"`
 		Demo     string `json:"demo"`
@@ -22,7 +22,7 @@ type VersionModel struct {
 
 var cachedLatestRelease *semver.Version = nil
 
-func LatestRelease() semver.Version {
+func latestRelease() semver.Version {
 	if cachedLatestRelease != nil {
 		return *cachedLatestRelease
 	}
@@ -37,7 +37,7 @@ func LatestRelease() semver.Version {
 		log.Fatalf("factorio api response status: %s\n", res.Status)
 	}
 
-	var infos VersionModel
+	var infos versionModel
 
 	err = json.NewDecoder(res.Body).Decode(&infos)
 	if err != nil {
