@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/adrg/xdg"
 	"github.com/nothub/factorio-server/internal/files"
-	"github.com/xi2/xz"
+	"github.com/ulikunitz/xz"
 	"io"
 	"io/fs"
 	"log"
@@ -234,7 +234,7 @@ func setup() {
 	}
 	defer f.Close()
 
-	xzR, err := xz.NewReader(f, 0)
+	xzR, err := xz.NewReader(f)
 	if err != nil {
 		log.Fatalln(err)
 	}
