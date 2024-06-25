@@ -165,7 +165,7 @@ func savesExist() (ok bool) {
 	return ok
 }
 
-var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorio_com.LatestRelease().String()))
+var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorio_com.LatestRelease()))
 
 func setup() {
 	binPath := filepath.Join(config.ServerDir, "bin", "x64", "factorio")
@@ -184,7 +184,7 @@ func setup() {
 			log.Fatalln(err)
 		}
 
-		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", factorio_com.LatestRelease().String())
+		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", factorio_com.LatestRelease())
 		log.Printf("downloading server archive from: %s\n", u)
 
 		req, err := http.NewRequest(http.MethodGet, u, nil)

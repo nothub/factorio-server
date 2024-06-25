@@ -22,9 +22,9 @@ type versionModel struct {
 
 var cachedLatestRelease *semver.Version = nil
 
-func LatestRelease() semver.Version {
+func LatestRelease() string {
 	if cachedLatestRelease != nil {
-		return *cachedLatestRelease
+		return cachedLatestRelease.String()
 	}
 
 	res, err := http.Get("https://factorio.com/api/latest-releases")
@@ -51,5 +51,5 @@ func LatestRelease() semver.Version {
 
 	cachedLatestRelease = &ver
 
-	return ver
+	return ver.String()
 }
