@@ -1,0 +1,55 @@
+# This is a goreleaser config file. Check the docs at https://goreleaser.com
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+project_name: factorio-server
+
+builds:
+  - binary: '{{ .ProjectName }}'
+    env:
+      - CGO_ENABLED=0
+    tags:
+      - osusergo
+      - netgo
+    ldflags:
+      - '-s'
+      - '-w'
+      - '-X github.com/nothub/factorio-server/buildinfo.version={{ .Version }}'
+      - '-X github.com/nothub/factorio-server/buildinfo.commit={{ .Commit }}'
+      - '-X github.com/nothub/factorio-server/buildinfo.date={{ .Date }}'
+      - '-X github.com/nothub/factorio-server/buildinfo.tool=goreleaser'
+    goos:
+      - linux
+    goarch:
+      - amd64
+    #no_unique_dist_dir: true
+
+upx:
+  - enabled: true
+    goos: [ linux ]
+    compress: best
+    lzma: true
+
+archives:
+  - meta: false
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    files:
+      - LICENSE.txt
+
+changelog:
+  sort: asc
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+release:
+  github:
+    owner: nothub
+    name: factorio-server
+  name_template: 'v{{ .Version }}'
+  header: 'Release generated at commit: {{ .ShortCommit }}'
+  draft: true
+  replace_existing_draft: true

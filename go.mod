@@ -4,10 +4,8 @@ go 1.22
 
 require (
 	github.com/adrg/xdg v0.4.0
-	github.com/nothub/semver v0.3.1
-	github.com/ulikunitz/xz v0.5.11
+	github.com/nothub/semver v0.10.0
+	github.com/ulikunitz/xz v0.5.12
 )
 
-require (
-	golang.org/x/sys v0.18.0 // indirect
-)
+require golang.org/x/sys v0.21.0 // indirect

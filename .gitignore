@@ -1,5 +1,7 @@
-/.idea/
-/.vscode/
+/**/.idea/
+/**/.vscode/
 
-/factorio-server
+/dist/
+/out/
+
 /server/
