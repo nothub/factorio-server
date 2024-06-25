@@ -20,17 +20,12 @@ func main() {
 	for {
 		s := <-signals
 		switch s {
-
-		case syscall.SIGHUP:
-			log.Printf("Signal %s received, handling is not implemented...\n", s.String())
-
-		case syscall.SIGINT:
-			fallthrough
-		case syscall.SIGTERM:
+		case syscall.SIGINT, syscall.SIGTERM:
 			log.Printf("Signal %s received, shutting down server...\n", s.String())
 			quit()
 			os.Exit(0)
-
+		default:
+			log.Printf("Signal %s received, handling is not implemented...\n", s.String())
 		}
 	}
 }
