@@ -4,16 +4,16 @@
 
 version: 2
 
-project_name: factorio-server
+project_name: 'factorio-server'
 
 builds:
   - binary: '{{ .ProjectName }}'
-    main: ./cmd/
+    main: './cmd/'
     env:
-      - CGO_ENABLED=0
+      - 'CGO_ENABLED=0'
     tags:
-      - osusergo
-      - netgo
+      - 'osusergo'
+      - 'netgo'
     ldflags:
       - '-s'
       - '-w'
@@ -22,34 +22,34 @@ builds:
       - '-X github.com/nothub/factorio-server/buildinfo.date={{ .Date }}'
       - '-X github.com/nothub/factorio-server/buildinfo.tool=goreleaser'
     goos:
-      - linux
+      - 'linux'
     goarch:
-      - amd64
+      - 'amd64'
     no_unique_dist_dir: true
 
 upx:
   - enabled: true
-    goos: [ linux ]
-    compress: best
+    goos: [ 'linux' ]
+    compress: 'best'
     lzma: true
 
 archives:
   - meta: false
     name_template: '{{ .ProjectName }}_{{ .Version }}'
     files:
-      - LICENSE.txt
+      - 'LICENSE.txt'
 
 changelog:
-  sort: asc
+  sort: 'asc'
 
 checksum:
-  name_template: "checksums.txt"
-  algorithm: sha256
+  name_template: 'checksums.txt'
+  algorithm: 'sha256'
 
 release:
   github:
-    owner: nothub
-    name: factorio-server
+    owner: 'nothub'
+    name: '{{ .ProjectName }}'
   name_template: 'v{{ .Version }}'
   header: 'Release generated at commit: {{ .ShortCommit }}'
   draft: true
