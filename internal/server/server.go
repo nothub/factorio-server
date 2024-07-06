@@ -105,8 +105,17 @@ func Run(args []string) (shutdown func()) {
 			case <-done:
 				return
 			case <-tick.C:
-				if scan.Scan() {
-					line := strings.TrimSpace(scan.Text())
+				for {
+					if !scan.Scan() {
+						if err := scan.Err(); err != nil {
+							log.Println(err)
+						}
+						break
+					}
+					line := scan.Text()
+					line = strings.TrimSuffix(line, "\r")
+					line = strings.TrimSuffix(line, "\n")
+					line = strings.TrimSpace(scan.Text())
 					if len(line) > 0 {
 						handle(line, in)
 					}
