@@ -115,7 +115,7 @@ func Run(args []string) (shutdown func()) {
 					line := scan.Text()
 					line = strings.TrimSuffix(line, "\r")
 					line = strings.TrimSuffix(line, "\n")
-					line = strings.TrimSpace(scan.Text())
+					line = strings.TrimSpace(line)
 					if len(line) > 0 {
 						handle(line, in)
 					}
