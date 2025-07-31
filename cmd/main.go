@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/nothub/factorio-server/internal/config"
 	"github.com/nothub/factorio-server/internal/server"
 	"log"
 	"os"
@@ -12,6 +13,8 @@ import (
 func main() {
 	log.SetFlags(0)
 	log.Println("The factory must grow!")
+
+	config.Load()
 
 	quit := server.Run(flag.Args())
 

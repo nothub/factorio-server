@@ -3,18 +3,6 @@
 > [!WARNING]
 > WiP
 
-## Usage
-
-```
-Usage of /tmp/factorio-server:
-  -factorio-token string
-    	factorio.com token
-  -factorio-user string
-    	factorio.com username
-  -server-dir string
-    	Server base dir and process pwd (default "server")
-```
-
 ## Build
 
 To build binaries, run:

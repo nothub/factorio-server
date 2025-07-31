@@ -2,27 +2,65 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"log"
-	"path/filepath"
+	"strings"
 )
 
-var ServerDir string
 var FactorioUser string
 var FactorioToken string
+var Mods []string
 
-func init() {
-	serverDirP := flag.String("server-dir", "server", "Server base dir and process pwd")
+func Load() {
+
+	ReadFile("config.yaml")
+	ReadFlags()
+	Validate()
+
+}
+
+func ReadFile(s string) {
+
+	// TODO
+
+}
+
+func ReadFlags() {
+
 	factorioUserP := flag.String("factorio-user", "", "factorio.com username")
 	factorioTokenP := flag.String("factorio-token", "", "factorio.com token")
+	factorioModsP := flag.String("mods", "", "game mods")
 
 	flag.Parse()
 
-	p, err := filepath.Abs(*serverDirP)
-	if err != nil {
-		log.Fatalln(err)
+	if len(strings.TrimSpace(*factorioUserP)) > 0 {
+		FactorioUser = *factorioUserP
 	}
-	ServerDir = p
 
-	FactorioUser = *factorioUserP
-	FactorioToken = *factorioTokenP
+	if len(strings.TrimSpace(*factorioTokenP)) > 0 {
+		FactorioToken = *factorioTokenP
+	}
+
+	{
+		var factorioMods []string
+		for _, mod := range strings.Split(*factorioModsP, ",") {
+			if len(strings.TrimSpace(mod)) > 0 {
+				factorioMods = append(factorioMods, mod)
+			}
+		}
+		Mods = factorioMods
+	}
+
+}
+
+func Validate() {
+
+	if len(strings.TrimSpace(FactorioUser)) < 1 {
+		log.Fatalln(fmt.Sprintf("config missing factorio.com username"))
+	}
+
+	if len(strings.TrimSpace(FactorioToken)) < 1 {
+		log.Fatalln(fmt.Sprintf("config missing factorio.com token"))
+	}
+
 }
