@@ -1,13 +1,16 @@
 package bans
 
 import (
+	"fmt"
+	"os"
 	"testing"
 )
 
 func TestFetch(t *testing.T) {
-	bans, err := Fetch()
+	filePath := fmt.Sprintf("%s/%s", os.TempDir(), "server-banlist.json")
+	bans, err := FetchAndWrite(filePath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("bans: %+v", bans)
+	t.Logf("%v bans at %s", len(bans), filePath)
 }

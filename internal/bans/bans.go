@@ -4,10 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 )
 
-// server-banlist.json
+func FetchAndWrite(filePath string) ([]string, error) {
+
+	bans, err := Fetch()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch bans: %w", err)
+	}
+
+	err = Write(filePath, bans)
+	if err != nil {
+		return nil, fmt.Errorf("failed to write bans: %w", err)
+	}
+
+	return bans, nil
+}
 
 func Fetch() (bans []string, err error) {
 
@@ -83,9 +99,37 @@ func Fetch() (bans []string, err error) {
 	}
 
 	slices.Sort(bans)
-	slices.Compact(bans)
+	bans = slices.Compact(bans)
+	{
+		var filtered []string
+		for _, ban := range bans {
+			if len(strings.TrimSpace(ban)) > 0 {
+				filtered = append(filtered, ban)
+			}
+		}
+		bans = filtered
+	}
 
 	return bans, nil
+}
+
+func Write(filePath string, bans []string) error {
+
+	if filepath.Base(filePath) != "server-banlist.json" {
+		return fmt.Errorf("file name must be server-banlist.json")
+	}
+
+	data, err := json.MarshalIndent(bans, "", "")
+	if err != nil {
+		return fmt.Errorf("failed to marshal ban list: %w", err)
+	}
+
+	err = os.WriteFile(filePath, data, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write ban list to %s: %w", filePath, err)
+	}
+
+	return nil
 }
 
 func getJson(url string, data any) error {
