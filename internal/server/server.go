@@ -65,7 +65,7 @@ func Run(args []string) (shutdown func()) {
 	}
 
 	cmd := exec.Command("./bin/x64/factorio", args...)
-	cmd.Dir = config.ServerDir
+	cmd.Dir = config.Loaded.WorkDir
 
 	// these pipes will read the process stdout and stderr
 	r, w, err := os.Pipe()
@@ -149,7 +149,7 @@ func handle(line string, in *io.WriteCloser) {
 
 func createMap() {
 	cmd := exec.Command("./bin/x64/factorio", "--create", "map.zip")
-	cmd.Dir = config.ServerDir
+	cmd.Dir = config.Loaded.WorkDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	log.Println("Creating fresh map")
@@ -177,7 +177,7 @@ func savesExist() (ok bool) {
 var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorio_com.LatestRelease()))
 
 func setup() {
-	binPath := filepath.Join(config.ServerDir, "bin", "x64", "factorio")
+	binPath := filepath.Join(config.Loaded.WorkDir, "bin", "x64", "factorio")
 	if _, err := os.Stat(binPath); err == nil {
 		// server dir is already prepared
 		return
@@ -229,7 +229,7 @@ func setup() {
 
 	// unpack archive
 
-	log.Printf("extracting %s to: %s\n", filepath.Base(archivePath), config.ServerDir)
+	log.Printf("extracting %s to: %s\n", filepath.Base(archivePath), config.Loaded.WorkDir)
 
 	f, err := os.Open(archivePath)
 	if err != nil {
@@ -257,7 +257,7 @@ func setup() {
 			continue
 		}
 
-		path, err := filepath.Abs(filepath.Join(config.ServerDir, strings.TrimPrefix(hdr.Name, "factorio/")))
+		path, err := filepath.Abs(filepath.Join(config.Loaded.WorkDir, strings.TrimPrefix(hdr.Name, "factorio/")))
 		if err != nil {
 			log.Fatalln(err)
 		}

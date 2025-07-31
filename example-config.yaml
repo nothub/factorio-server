@@ -1,0 +1,26 @@
+factorio-user: "hub",
+factorio-token: "correcthorsebatterystaple",
+mods:
+  - "AutoDeconstruct",
+  - "BottleneckLite",
+  - "CleanFloor",
+  - "CopyPasteModules",
+  - "DiscoScience",
+  - "EvenDistributionLite",
+  - "Fill4Me",
+  - "RPGsystem",
+  - "RateCalculator",
+  - "Teleporters",
+  - "VehicleSnap",
+  - "Waterfill_v17",
+  - "alien-biomes"
+  - "bullet-trails",
+  - "elevated-rails"
+  - "flib",
+  - "helmod",
+  - "informatron"
+  - "jetpack"
+  - "pushbutton",
+  - "show-max-underground-distance",
+  - "shrekported",
+  - "squeak-through-2",
