@@ -1,26 +1,28 @@
-factorio-user: "hub",
-factorio-token: "correcthorsebatterystaple",
+factorio-user: "hub"
+factorio-token: "0correct0horse0battery0staple0"
+webhook-chat: "https://discord.com/api/webhooks/0000000000000000000/HfpcUoyYdEby7-v79JnRNxWjrnTkqwvahzJwx4MWmhkWamH7pN9Kb-URU3RxrebjFWER"
+webhook-status: "https://discord.com/api/webhooks/0000000000000000000/AoL3aAXLpfd9Pz-kX9hA9E7RXyULL7pNjpV7CNFgqnsd-crtijviVsiFbN9biMYjoYzX"
 mods:
-  - "AutoDeconstruct",
-  - "BottleneckLite",
-  - "CleanFloor",
-  - "CopyPasteModules",
-  - "DiscoScience",
-  - "EvenDistributionLite",
-  - "Fill4Me",
-  - "RPGsystem",
-  - "RateCalculator",
-  - "Teleporters",
-  - "VehicleSnap",
-  - "Waterfill_v17",
+  - "AutoDeconstruct"
+  - "BottleneckLite"
+  - "CleanFloor"
+  - "CopyPasteModules"
+  - "DiscoScience"
+  - "EvenDistributionLite"
+  - "Fill4Me"
+  - "RPGsystem"
+  - "RateCalculator"
+  - "Teleporters"
+  - "VehicleSnap"
+  - "Waterfill_v17"
   - "alien-biomes"
-  - "bullet-trails",
+  - "bullet-trails"
   - "elevated-rails"
-  - "flib",
-  - "helmod",
+  - "flib"
+  - "helmod"
   - "informatron"
   - "jetpack"
-  - "pushbutton",
-  - "show-max-underground-distance",
-  - "shrekported",
-  - "squeak-through-2",
+  - "pushbutton"
+  - "show-max-underground-distance"
+  - "shrekported"
+  - "squeak-through-2"
