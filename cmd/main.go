@@ -8,12 +8,18 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
 )
 
 func main() {
 	log.SetFlags(0)
 	log.Println("The factory must grow!")
+
+	if slices.Contains(os.Args, "-h") || slices.Contains(os.Args, "--help") {
+		log.Println("Usage: ./factorio-server")
+		return
+	}
 
 	config.Load()
 

@@ -18,26 +18,9 @@ func Sync() error {
 		return fmt.Errorf("failed to create mods directory: %w", err)
 	}
 
-	var latestFileNames []string
-
-	for _, modId := range config.Loaded.Mods {
-
-		if modId == "base" {
-			continue
-		}
-
-		mod, err := factorioCom.GetModInfo(modId)
-		if err != nil {
-			return fmt.Errorf("failed to get mod info for %s: %w", modId, err)
-		}
-
-		fileName, err := factorioCom.DownloadMod(mod)
-		if err != nil {
-			return fmt.Errorf("failed to download mod %s: %w", mod.Name, err)
-		}
-
-		latestFileNames = append(latestFileNames, fileName)
-
+	latestFileNames, err := downloadMods()
+	if err != nil {
+		return err
 	}
 
 	err = cleanupMods(latestFileNames)
@@ -51,6 +34,32 @@ func Sync() error {
 	}
 
 	return nil
+}
+
+func downloadMods() ([]string, error) {
+
+	var latestFileNames []string
+
+	for _, modId := range config.Loaded.Mods {
+
+		if modId == "base" {
+			continue
+		}
+
+		mod, err := factorioCom.GetModInfo(modId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get mod info for %s: %w", modId, err)
+		}
+
+		fileName, err := factorioCom.DownloadMod(mod)
+		if err != nil {
+			return nil, fmt.Errorf("failed to download mod %s: %w", mod.Name, err)
+		}
+
+		latestFileNames = append(latestFileNames, fileName)
+	}
+
+	return latestFileNames, nil
 }
 
 func cleanupMods(latestFileNames []string) error {

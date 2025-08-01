@@ -3,6 +3,13 @@
 > [!WARNING]
 > WiP
 
+## Usage
+
+```
+The factory must grow!
+Usage: ./factorio-server
+```
+
 ## Build
 
 To build binaries, run:
