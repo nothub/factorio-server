@@ -1,61 +1,131 @@
 package mods
 
 import (
+	"encoding/json"
 	"fmt"
-	"html"
+	"github.com/nothub/factorio-server/internal/config"
+	factorioCom "github.com/nothub/factorio-server/internal/factorio.com"
 	"log"
-	"time"
+	"os"
+	"path/filepath"
+	"slices"
 )
 
-type mod struct {
-	Category          string `json:"category"`
-	DownloadsCount    int    `json:"downloads_count"`
-	LastHighlightedAt string `json:"last_highlighted_at"`
-	Name              string `json:"name"`
-	Owner             string `json:"owner"`
-	Releases          []struct {
-		DownloadUrl string `json:"download_url"`
-		FileName    string `json:"file_name"`
-		InfoJson    struct {
-			FactorioVersion string `json:"factorio_version"`
-		} `json:"info_json"`
-		ReleasedAt time.Time `json:"released_at"`
-		Sha1       string    `json:"sha1"`
-		Version    string    `json:"version"`
-	} `json:"releases"`
-	Score     float64 `json:"score"`
-	Summary   string  `json:"summary"`
-	Thumbnail string  `json:"thumbnail"`
-	Title     string  `json:"title"`
-}
+func Sync() error {
 
-// mod-list.json
+	err := os.MkdirAll("mods", 0755)
+	if err != nil {
+		return fmt.Errorf("failed to create mods directory: %w", err)
+	}
 
-// TODO: factorio api client
+	var latestFileNames []string
 
-// TODO: download / update mods
+	for _, modId := range config.Loaded.Mods {
 
-var modList = []string{"Nanobots"}
-
-func downloadMods() {
-	for _, name := range modList {
-		if name == "base" {
+		if modId == "base" {
 			continue
 		}
-		u := fmt.Sprintf("https://mods.factorio.com/api/mods/%s", html.EscapeString(name))
-		log.Printf("downloading: %s\n", u)
-		// u returns mod
-		//
-		// url_segm: '.releases | last | .download_url'
-		// filename: '.releases | last | .file_name'
-		//
-		// skip existing
-		//
-		// delete old
-		//   find "${dir}" -type f -name "${mod_name}_*.zip" -exec rm -f {} \;
-		//
-		//  download new
-		//    echo "downloading ${file_name}" >&2
-		//    curl -sSL -o "${dir}/${file_name}" "https://mods.factorio.com${url_segm}?username=${username}&token=${token}"
+
+		mod, err := factorioCom.GetModInfo(modId)
+		if err != nil {
+			return fmt.Errorf("failed to get mod info for %s: %w", modId, err)
+		}
+
+		fileName, err := factorioCom.DownloadMod(mod)
+		if err != nil {
+			return fmt.Errorf("failed to download mod %s: %w", mod.Name, err)
+		}
+
+		latestFileNames = append(latestFileNames, fileName)
+
 	}
+
+	err = cleanupMods(latestFileNames)
+	if err != nil {
+		return err
+	}
+
+	err = generateListFile()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func cleanupMods(latestFileNames []string) error {
+
+	entries, err := os.ReadDir("mods")
+	if err != nil {
+		return fmt.Errorf("failed reading mods dir: %w", err)
+	}
+
+	for _, entry := range entries {
+
+		if entry.IsDir() {
+			continue
+		}
+
+		if entry.Name() == "mod-list.json" {
+			continue
+		}
+
+		if entry.Name() == "mod-settings.dat" {
+			continue
+		}
+
+		if slices.Contains(latestFileNames, entry.Name()) {
+			continue
+		}
+
+		log.Printf("Removing %s (old)\n", entry.Name())
+		err = os.Remove(filepath.Join("mods", entry.Name()))
+		if err != nil {
+			return fmt.Errorf("failed to delete file %s: %w", entry.Name(), err)
+		}
+
+	}
+
+	return nil
+}
+
+func generateListFile() error {
+
+	type ModListData struct {
+		Mods []struct {
+			Name    string `json:"name"`
+			Enabled bool   `json:"enabled"`
+		} `json:"mods"`
+	}
+
+	var modList ModListData
+	modList.Mods = append(modList.Mods, struct {
+		Name    string `json:"name"`
+		Enabled bool   `json:"enabled"`
+	}{
+		Name:    "base",
+		Enabled: true,
+	})
+
+	for _, mod := range config.Loaded.Mods {
+		modList.Mods = append(modList.Mods, struct {
+			Name    string `json:"name"`
+			Enabled bool   `json:"enabled"`
+		}{
+			Name:    mod,
+			Enabled: true,
+		})
+	}
+
+	modListData, err := json.MarshalIndent(modList, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal mod-list.json: %w", err)
+	}
+
+	err = os.WriteFile(filepath.Join("mods", "mod-list.json"), modListData, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write mod-list.json: %w", err)
+	}
+
+	return nil
 }

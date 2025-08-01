@@ -138,7 +138,7 @@ func handle(line string, in *io.WriteCloser) {
 	if m := reChangeState.FindStringSubmatch(line); m != nil {
 		log.Printf("[EVENT] state changed: %s -> %s\n", m[1], m[2])
 		if m[2] == "InGame" {
-			(*in).Write([]byte("lets go\n"))
+			//(*in).Write([]byte("lets go\n"))
 			go func() { discord.SendWebhook("🚀 Server ready!", config.Loaded.WebhookStatus) }()
 		}
 	} else if m := reChat.FindStringSubmatch(line); m != nil {
@@ -150,6 +150,8 @@ func handle(line string, in *io.WriteCloser) {
 	} else if m := reLeft.FindStringSubmatch(line); m != nil {
 		log.Printf("[EVENT] player left: %s\n", m[1])
 		go func() { discord.SendWebhook(fmt.Sprintf("👋 %s left", m[1]), config.Loaded.WebhookStatus) }()
+	} else {
+
 	}
 }
 

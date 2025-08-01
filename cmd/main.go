@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/nothub/factorio-server/internal/config"
+	"github.com/nothub/factorio-server/internal/mods"
 	"github.com/nothub/factorio-server/internal/server"
 	"log"
 	"os"
@@ -25,6 +26,12 @@ func main() {
 	err = os.Chdir("server")
 	if err != nil {
 		log.Fatalf("failed switching to server dir: %v\n", err)
+		return
+	}
+
+	err = mods.Sync()
+	if err != nil {
+		log.Fatalf("failed syncing mods: %v\n", err)
 		return
 	}
 
