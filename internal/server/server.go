@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"github.com/adrg/xdg"
 	"github.com/nothub/factorio-server/internal/config"
-	factorio_com "github.com/nothub/factorio-server/internal/factorio.com"
-	"github.com/nothub/factorio-server/internal/files"
+	"github.com/nothub/factorio-server/internal/discord"
+	factorioCom "github.com/nothub/factorio-server/internal/factorio.com"
+	"github.com/nothub/factorio-server/internal/utils/files"
 	"github.com/ulikunitz/xz"
 	"io"
 	"io/fs"
@@ -65,7 +66,6 @@ func Run(args []string) (shutdown func()) {
 	}
 
 	cmd := exec.Command("./bin/x64/factorio", args...)
-	cmd.Dir = config.Loaded.WorkDir
 
 	// these pipes will read the process stdout and stderr
 	r, w, err := os.Pipe()
@@ -88,8 +88,9 @@ func Run(args []string) (shutdown func()) {
 		}
 		in = &stdin
 
-		// Run server process and wait for it to finish
-		log.Println("Starting the server")
+		// Run and wait for process to exit
+		log.Println("Starting server!")
+		go func() { discord.SendWebhook("😎 Starting server!", config.Loaded.WebhookStatus) }()
 		if err = cmd.Run(); err != nil {
 			log.Fatalln(err)
 		}
@@ -126,6 +127,7 @@ func Run(args []string) (shutdown func()) {
 
 	return func() {
 		log.Println("Stopping server!")
+		go func() { discord.SendWebhook("😦 Stopping server!", config.Loaded.WebhookStatus) }()
 		tick.Stop()
 		done <- true
 	}
@@ -137,19 +139,22 @@ func handle(line string, in *io.WriteCloser) {
 		log.Printf("[EVENT] state changed: %s -> %s\n", m[1], m[2])
 		if m[2] == "InGame" {
 			(*in).Write([]byte("lets go\n"))
+			go func() { discord.SendWebhook("🚀 Server ready!", config.Loaded.WebhookStatus) }()
 		}
 	} else if m := reChat.FindStringSubmatch(line); m != nil {
 		log.Printf("[EVENT] player %s says: %s\n", m[1], m[2])
+		go func() { discord.SendWebhook(fmt.Sprintf("%s says: %s", m[1], m[2]), config.Loaded.WebhookChat) }()
 	} else if m := reJoined.FindStringSubmatch(line); m != nil {
 		log.Printf("[EVENT] player joined: %s\n", m[1])
+		go func() { discord.SendWebhook(fmt.Sprintf("👋 %s joined", m[1]), config.Loaded.WebhookStatus) }()
 	} else if m := reLeft.FindStringSubmatch(line); m != nil {
 		log.Printf("[EVENT] player left: %s\n", m[1])
+		go func() { discord.SendWebhook(fmt.Sprintf("👋 %s left", m[1]), config.Loaded.WebhookStatus) }()
 	}
 }
 
 func createMap() {
 	cmd := exec.Command("./bin/x64/factorio", "--create", "map.zip")
-	cmd.Dir = config.Loaded.WorkDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	log.Println("Creating fresh map")
@@ -174,10 +179,10 @@ func savesExist() (ok bool) {
 	return ok
 }
 
-var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorio_com.LatestRelease()))
+var archiveCachePath = filepath.Join("factorio-server", fmt.Sprintf("factorio_headless_x64_%s.tar.xz", factorioCom.LatestRelease()))
 
 func setup() {
-	binPath := filepath.Join(config.Loaded.WorkDir, "bin", "x64", "factorio")
+	binPath := filepath.Join("bin", "x64", "factorio")
 	if _, err := os.Stat(binPath); err == nil {
 		// server dir is already prepared
 		return
@@ -193,7 +198,7 @@ func setup() {
 			log.Fatalln(err)
 		}
 
-		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", factorio_com.LatestRelease())
+		u := fmt.Sprintf("https://www.factorio.com/get-download/%s/headless/linux64", factorioCom.LatestRelease())
 		log.Printf("downloading server archive from: %s\n", u)
 
 		req, err := http.NewRequest(http.MethodGet, u, nil)
@@ -229,7 +234,7 @@ func setup() {
 
 	// unpack archive
 
-	log.Printf("extracting %s to: %s\n", filepath.Base(archivePath), config.Loaded.WorkDir)
+	log.Printf("extracting %s\n", filepath.Base(archivePath))
 
 	f, err := os.Open(archivePath)
 	if err != nil {
@@ -257,7 +262,7 @@ func setup() {
 			continue
 		}
 
-		path, err := filepath.Abs(filepath.Join(config.Loaded.WorkDir, strings.TrimPrefix(hdr.Name, "factorio/")))
+		path, err := filepath.Abs(strings.TrimPrefix(hdr.Name, "factorio/"))
 		if err != nil {
 			log.Fatalln(err)
 		}

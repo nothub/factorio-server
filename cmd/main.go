@@ -16,6 +16,18 @@ func main() {
 
 	config.Load()
 
+	err := os.MkdirAll("server", 0755)
+	if err != nil {
+		log.Fatalf("failed creating server dir: %v\n", err)
+		return
+	}
+
+	err = os.Chdir("server")
+	if err != nil {
+		log.Fatalf("failed switching to server dir: %v\n", err)
+		return
+	}
+
 	quit := server.Run(flag.Args())
 
 	signals := make(chan os.Signal, 1)
