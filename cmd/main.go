@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/nothub/factorio-server/internal/config"
 	"github.com/nothub/factorio-server/internal/mods"
 	"github.com/nothub/factorio-server/internal/server"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	log.Println("The factory must grow!")
+	fmt.Fprintln(os.Stderr, "The factory must grow!")
 
 	if slices.Contains(os.Args, "-h") || slices.Contains(os.Args, "--help") {
 		log.Println("Usage: ./factorio-server")
